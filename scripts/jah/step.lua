@@ -40,32 +40,32 @@ local grid_available
 
 local locks = {}
 
-local set_lock = function(x, y, value)
+local function set_lock(x, y, value) -- TODO: param locks
   locks[y*maxwidth+x] = value
 end
 
-local trig_is_locked = function(x, y)
+local function trig_is_locked(x, y) -- TODO: param locks
   return locks[y*maxwidth+x]
 end
 
-local get_lock = function(x, y)
+local function get_lock(x, y) -- TODO: param locks
   return locks[y*maxwidth+x]
 end
 
 local trigs = {}
 
-local set_trig = function(x, y, value)
+local function set_trig(x, y, value)
   trigs[y*maxwidth+x] = value
   if not value then
     set_lock(x, y, nil)
   end
 end
 
-local trig_is_set = function(x, y)
+local function trig_is_set(x, y)
   return trigs[y*maxwidth+x]
 end
 
-local refresh_grid_button = function(x, y, refresh)
+local function refresh_grid_button(x, y, refresh)
   if g then
     if params:get("last row cuts") == 2 and y == 8 then
       if x-1 == playpos then
@@ -88,7 +88,7 @@ local refresh_grid_button = function(x, y, refresh)
   end
 end
 
-local refresh_grid_column = function(x, refresh)
+local function refresh_grid_column(x, refresh)
   for y=1,height do
     refresh_grid_button(x, y, false)
   end
@@ -97,7 +97,7 @@ local refresh_grid_column = function(x, refresh)
   end
 end
 
-local refresh_grid = function()
+local function refresh_grid()
   for x=1,maxwidth do
     refresh_grid_column(x, false)
   end
@@ -173,17 +173,17 @@ local function update_swing(swing_amount)
   odd_ppqn = util.round(ppqn-swing_ppqn)
 end
 
-init = function()
+function init()
   for x=1,maxwidth do
     for y=1,height do
       set_trig(x, y, false)
     end
   end
 
-  timer = metro[1] -- TODO: this is probably no longer the way to spawn metros(?)
+  timer = metro.alloc()
   timer.callback = tick
 
-  params:add_option("grid width", {"8", "16"}, 2) -- TODO: can now be inferred from grid metadata
+  params:add_option("grid width", {"8", "16"}, 2) -- TODO: should now be possible to infer from grid metadata(?)
   params:set_action("grid width", function(value) update_metro_time() end)
   params:add_option("last row cuts", {"no", "yes"}, 1)
   params:set_action("last row cuts", function(value)
@@ -200,6 +200,7 @@ init = function()
   params:add_control("swing amount", swing_amount_spec)
   params:set_action("swing amount", update_swing)
 
+  params:add_separator()
   Ack.add_params()
   params:bang()
 
@@ -209,7 +210,7 @@ init = function()
   timer:start()
 end
 
-enc = function(n, delta)
+function enc(n, delta)
   if n == 1 then
     mix:delta("output", delta)
   elseif n == 2 then
@@ -220,7 +221,7 @@ enc = function(n, delta)
   redraw()
 end
 
-key = function(n, z)
+function key(n, z)
   if n == 2 and z == 1 then
     if playing == false then
       playpos = -1
@@ -243,7 +244,7 @@ key = function(n, z)
   redraw()
 end
 
-redraw = function()
+function redraw()
   screen.font_size(8)
   screen.clear()
   screen.level(15)
@@ -287,7 +288,7 @@ redraw = function()
   screen.update()
 end
 
-gridkey = function(x, y, state)
+function gridkey(x, y, state)
   if state == 1 then
     if params:get("last row cuts") == 2 and y == 8 then
       queued_playpos = x-1
@@ -307,7 +308,7 @@ gridkey = function(x, y, state)
   redraw()
 end
 
-cleanup = function()
+function cleanup()
   if g then
     g:all(0)
     g:refresh()
