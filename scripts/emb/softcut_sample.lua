@@ -2,11 +2,9 @@
 ---
 --- simple demonstration: play sample and randomly change rate
 
-
 -- if the script sets this global variable,
 -- norns will attempt to load the requested engine when launching the script.
--- 'SoftCut' is a polyphonic, tape-like record system with crossfading, used in MLR.
-
+-- 'SoftCut' is a polyphonic, tape-like record/play system with crossfading, used in MLR.
 engine.name = 'SoftCut'
 
 -- if the script sets this variable to a function, it will be executed when the engine is done loading.
@@ -15,7 +13,8 @@ function init()
 
    -- the global table 'engine' should now be populated with a lot of function-type fields,
    -- corresponding to "commands" declared in the engine's SC class.
-   -- these should be printed in the REPL output at this point.
+   -- this will print them all (names and argument format) in the matron REPL:
+   engine.list_commands()
 
    -- in SoftCut, all the voices share one large audio buffer.
    -- by default, they are assigned to read and write from adjacent regions.
