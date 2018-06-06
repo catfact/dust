@@ -22,7 +22,8 @@ function init()
    -- specifying a destination start and end point.
    -- this will load 4 seconds of the given soundfile into the top of the buffer
    engine.read("/home/we/dust/audio/tehn/whirl1.aif", 0.0, 4.0)
-   -- set the voice 1 loop points to (1s, 2s), allowing post-roll for crossfading.
+   -- set the voice 1 loop points to the range [1s, 3s], 
+   -- allowing pre- and post-roll for crossfading.
    engine.loop_start(1, 1)
    engine.loop_end(1, 3)
    -- enable looping
