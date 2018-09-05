@@ -11,6 +11,8 @@
 local tab = require 'tabutil'
 local pattern_time = require 'pattern_time'
 
+local g = grid.connect()
+
 local mode_transpose = 0
 local root = { x=5, y=5 }
 local trans = { x=5, y=5 }
@@ -23,6 +25,8 @@ local ripple_repeat_rate = 1 / 0.3 / screen_framerate
 local ripple_decay_rate = 1 / 0.5 / screen_framerate
 local ripple_growth_rate = 1 / 0.02 / screen_framerate
 local screen_notes = {}
+
+local MAX_NUM_VOICES = 16
 
 engine.name = 'PolySub'
 
@@ -118,7 +122,7 @@ function init()
 
 end
 
-function gridkey(x, y, z)
+function g.event(x, y, z)
   if x == 1 then
     if z == 1 then
       if y == 1 and pat.rec == 0 then
@@ -175,7 +179,7 @@ end
 function grid_note(e)
   local note = ((7-e.y)*5) + e.x
   if e.state > 0 then
-    if nvoices < 6 then
+    if nvoices < MAX_NUM_VOICES then
       --engine.start(id, getHz(x, y-1))
       --print("grid > "..id.." "..note)
       engine.start(e.id, getHzET(note))
@@ -199,7 +203,7 @@ end
 function grid_note_trans(e)
   local note = ((7-e.y+(root.y-trans.y))*5) + e.x + (trans.x-root.x)
   if e.state > 0 then
-    if nvoices < 6 then
+    if nvoices < MAX_NUM_VOICES then
       --engine.start(id, getHz(x, y-1))
       --print("grid > "..id.." "..note)
       engine.start(e.id, getHzET(note))
@@ -219,14 +223,14 @@ function grid_note_trans(e)
 end
 
 function gridredraw()
-  g:all(0)
-  g:led(1,1,2 + pat.rec * 10)
-  g:led(1,2,2 + pat.play * 10)
-  g:led(1,8,2 + mode_transpose * 10)
+  g.all(0)
+  g.led(1,1,2 + pat.rec * 10)
+  g.led(1,2,2 + pat.play * 10)
+  g.led(1,8,2 + mode_transpose * 10)
 
-  if mode_transpose == 1 then g:led(trans.x, trans.y, 4) end
+  if mode_transpose == 1 then g.led(trans.x, trans.y, 4) end
   for i,e in pairs(lit) do
-    g:led(e.x, e.y,15)
+    g.led(e.x, e.y,15)
   end
 
   g:refresh()
@@ -341,7 +345,7 @@ function redraw()
 end
 
 local function note_on(note, vel)
-  if nvoices < 6 then
+  if nvoices < MAX_NUM_VOICES then
     --engine.start(id, getHz(x, y-1))
     engine.start(note, getHzET(note))
     start_screen_note(note)
