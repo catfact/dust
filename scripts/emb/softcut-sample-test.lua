@@ -18,6 +18,32 @@ local BUFDUR = 300
 -- region data
 local r = { start = 1, stop = BUFDUR }
 
+
+-- phase state
+local phase = {0, 0, 0, 0 }
+
+local draw_screen = function()
+      screen.clear()
+   screen.level(15)
+  
+   for i=1,4 do
+      screen.move(10, i * 12)
+      screen.text("phase ".. i .. " = "  .. phase[i] )
+   end
+   
+   screen.update()
+end
+
+
+local handle_phase = function(i, x)
+   phase[i] = x 
+end
+
+-- set global redraw func
+function redraw()
+   draw_screen()
+end
+
 function init()
    local path = "/home/we/dust/audio/tape/hermit_leaves.wav"
    local ch, len = sound_file_inspect(path)
@@ -63,38 +89,16 @@ function init()
       end, 1.0)
       rate_m:start()
 
-      
-      -----------
-      -- enabling this stuff seems to cause the crash??
-      --[[
-      -- show phase...
+
+      -- update the phase
       local phase_poll = {}
       for i=1,4 do
-	 phase_poll[i] = poll.set("phase_quant_"..i, function(x) phase[i] = x end)
+	 phase_poll[i] = poll.set("phase_quant_"..i, function(x) handle_phase(i, x) end)
 	 phase_poll[i]:start()
       end
-      --]]
+      
+      local screen_m = metro.alloc(function() redraw() end, 0.2)
+      screen_m:start()
+      
    end   
-end
-
-local phase = {0, 0, 0, 0 }	       
--- hm, redraw as a global is... weird. for one thing we cant see stuff in local scope
-local my_redraw = function()   
-   screen.clear()
-   screen.level(15)
---   screen.font_face(1)
---   screen.font_size(12)
-  
-   for i=1,4 do
-      screen.move(10, i * 12)
-      screen.text("phase ".. i .. " = "  .. phase[i] )
-   end
-   
-   screen.update()
-end
-
--- set global redraw
-function redraw()
-   print("redraw!")
-   my_redraw()
 end
