@@ -1,3 +1,9 @@
+-- basic sample playback test
+--
+-- one long sample
+-- all voices
+-- random rate changes
+
 local math = require 'math'
 
 engine.name = "SoftCut"
@@ -57,27 +63,38 @@ function init()
       end, 1.0)
       rate_m:start()
 
+      
+      -----------
+      -- enabling this stuff seems to cause the crash??
+      --[[
       -- show phase...
-      local phase = {0, 0, 0, 0}
       local phase_poll = {}
       for i=1,4 do
 	 phase_poll[i] = poll.set("phase_quant_"..i, function(x) phase[i] = x end)
+	 phase_poll[i]:start()
       end
-
-      --- ... on screen?
-      local redraw_m = metro.alloc(redraw, 0.2)
+      --]]
    end   
 end
 
-local redraw = function()
+local phase = {0, 0, 0, 0 }	       
+-- hm, redraw as a global is... weird. for one thing we cant see stuff in local scope
+local my_redraw = function()   
    screen.clear()
    screen.level(15)
-
+--   screen.font_face(1)
+--   screen.font_size(12)
+  
    for i=1,4 do
-      screen.move(10, i * 10)
-      screen.text("" .. phase[i])
+      screen.move(10, i * 12)
+      screen.text("phase ".. i .. " = "  .. phase[i] )
    end
    
    screen.update()
 end
 
+-- set global redraw
+function redraw()
+   print("redraw!")
+   my_redraw()
+end
