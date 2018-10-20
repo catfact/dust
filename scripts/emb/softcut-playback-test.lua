@@ -54,9 +54,9 @@ function init()
       dur = BUFDUR - r.start
    end
    -- set the region
-   r.stop = r.start + dur
+   r.stop = r.start + (dur - r.start)
    -- load the buffer
-   e.read(path, r.start, dur)
+   e.read(path, 0, dur)
 
    local pan = {{1, 0}, {0.75, 0.25}, {0.25, 0.75}, {0, 1}}
    

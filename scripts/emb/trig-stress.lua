@@ -9,7 +9,7 @@ init = function()
     local phase_poll = {}
     for i=1,4 do
 
-        params:add{type = "number", id = "trig_hz_"..i, name = "Trigger Rate "..i, min = 1, max = 100, default = 5, action = function(value)
+        params:add{type = "number", id = "trig_hz_"..i, name = "Trigger Rate "..i, min = 1, max = 500, default = 5, action = function(value)
             engine.trig_hz(i, value)    
           end}
 
