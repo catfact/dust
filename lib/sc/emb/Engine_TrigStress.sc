@@ -2,6 +2,7 @@ Engine_TrigStress : CroneEngine {
     var syn;
     var osc;
     var poll;
+    classvar num = 4;
 
     *new { arg context, doneCallback;
 		^super.new(context, doneCallback);
@@ -42,8 +43,8 @@ Engine_TrigStress : CroneEngine {
         s.sync;
 
 
-        syn = Array.fill(2, { |i| 
-            Synth.new(\trig_sine, [\out, context.out_b.index + i, \id, i], s);
+        syn = Array.fill(num, { |i| 
+            Synth.new(\trig_sine, [\out, context.out_b.index + (i%2), \id, i], s);
         });
 
         osc = OSCFunc({ arg msg, time;
@@ -53,12 +54,17 @@ Engine_TrigStress : CroneEngine {
             // [time, msg].postln;
         },'/tr', s.addr);
 
-        poll = Array.fill(2, { |i| 
+        poll = Array.fill(num, { |i| 
 			this.addPoll("trig_" ++ (i+1), periodic:false);
 		});
 
         this.addCommand(\trig_hz, \if, { |msg| syn[msg[1]-1].set(\trig_hz, msg[2]); });
         this.addCommand(\hz_mul, \if, { |msg| syn[msg[1]-1].set(\hz_mul, msg[2]); });
         this.addCommand(\hz_add, \if, { |msg| syn[msg[1]-1].set(\hz_add, msg[2]); });
+    }
+
+    free  {
+        syn.do({|sn| sn.free; });
+        osc.free;
     }
 }
